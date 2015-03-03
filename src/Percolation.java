@@ -1,35 +1,35 @@
 public class Percolation {
 
-    private Site[][] grid;
+    private boolean[][] openedSites;
     private int gridLineSize;
     private WeightedQuickUnionUF unionFind;
 
-    public Percolation(int N) { // create N-by-N grid, with all sites blocked
+    public Percolation(int N) { // create N-by-N openedSites, with all sites blocked
         if (N > 0) {
             unionFind = new WeightedQuickUnionUF(N * N);
             gridLineSize = N;
-            grid = new Site[N][N];
-            int count = 1;
+            openedSites = new boolean[N][N];
+            /*int count = 1;
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < N; j++) {
-                    grid[i][j] = new Site(count++);
+                    openedSites[i][j] = new Site(count++);
                 }
-            }
+            }*/
         } else {
             throw new IllegalArgumentException();
         }
-    }               // create N-by-N grid, with all sites blocked
+    }               // create N-by-N openedSites, with all sites blocked
 
     private void printGrid() {
         for (int i = 0; i < gridLineSize; i++) {
             for (int j = 0; j < gridLineSize; j++) {
-                System.out.print(grid[i][j]);
+                System.out.print(openedSites[i][j]);
             }
             System.out.println();
         }
     }
 
-    private static class Site {
+   /* private static class Site {
         private int mId;
         private boolean mIsOpened;
 
@@ -60,7 +60,7 @@ public class Percolation {
 
             return isOpened + id + " ";
         }
-    }
+    }*/
 
     private int xyTo1D(int x, int y) {
         return ((x - 1) * gridLineSize) + y - 1;
@@ -73,9 +73,9 @@ public class Percolation {
 
     public void open(int x, int y) {        // open site (row i, column j) if it is not open already
         validate(x, y);
-        Site site = grid[x - 1][y - 1];
-        if (!site.mIsOpened) {
-            site.setSiteOpened(true);
+        boolean siteOpened = openedSites[x - 1][y - 1];
+        if (!siteOpened) {
+            openedSites[x - 1][y - 1] = true;
             connectWithOpenedNeighbors(x, y);
         }
 
@@ -83,7 +83,7 @@ public class Percolation {
 
     public boolean isOpen(int x, int y) { // is site (row i, column j) open?
         validate(x, y);
-        return grid[x - 1][y - 1].isSiteOpened();
+        return openedSites[x - 1][y - 1];
 
     }
 
@@ -105,12 +105,12 @@ public class Percolation {
 
     public boolean isFull(int x, int y) { // is site (row i, column j) full?
         validate(x, y);
-        Site currentSite = grid[x - 1][y - 1];
-        if (!currentSite.mIsOpened)
+        boolean currentSiteOpened = openedSites[x - 1][y - 1];
+        if (!currentSiteOpened)
             return false;
         for (int i = 0; i < gridLineSize; i++) {
-            Site topSite = grid[0][i];
-            if (topSite.isSiteOpened() && unionFind.connected(topSite.mId - 1, currentSite.mId - 1))
+            boolean topSiteOpened = openedSites[0][i];
+            if (topSiteOpened && unionFind.connected(xyTo1D(1, i + 1), xyTo1D(x, y)))
                 return true;
         }
         return false;
