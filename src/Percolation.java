@@ -1,37 +1,26 @@
-import java.util.Random;
-
 public class Percolation {
 
     private Site[][] grid;
-    private Random rand;
-    private int count;
     private int gridLineSize;
     private WeightedQuickUnionUF unionFind;
 
-    public Percolation(int N) throws IndexOutOfBoundsException {// create N-by-N grid, with all sites blocked
-        if (N > 0){
-            unionFind = new WeightedQuickUnionUF(N);
+    public Percolation(int N) { // create N-by-N grid, with all sites blocked
+        if (N > 0) {
+            unionFind = new WeightedQuickUnionUF(N * N);
             gridLineSize = N;
-
             grid = new Site[N][N];
-            rand = new Random();
-
-            count = 1;
-
+            int count = 1;
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < N; j++) {
-                    grid[i][j] = new Site(count++) ;
-                    System.out.print(grid[i][j]);
+                    grid[i][j] = new Site(count++);
                 }
-                System.out.println();
             }
-
         } else {
-            throw new IndexOutOfBoundsException();
+            throw new IllegalArgumentException();
         }
     }               // create N-by-N grid, with all sites blocked
 
-    private void printGrid(){
+    private void printGrid() {
         for (int i = 0; i < gridLineSize; i++) {
             for (int j = 0; j < gridLineSize; j++) {
                 System.out.print(grid[i][j]);
@@ -40,109 +29,134 @@ public class Percolation {
         }
     }
 
-    private class Site{
-        private int id;
-        private boolean isOpened;
+    private static class Site {
+        private int mId;
+        private boolean mIsOpened;
 
         public Site(int id) {
-            this.id = id;
+            this.mId = id;
         }
 
         public void setSiteOpened(boolean isOpened) {
-            this.isOpened = isOpened;
-        }
-
-        public int getId() {
-            return id;
+            this.mIsOpened = isOpened;
         }
 
         public boolean isSiteOpened() {
-            return isOpened;
+            return mIsOpened;
         }
 
         @Override
         public String toString() {
             String isOpened;
             String id;
-            if(isSiteOpened())
+            if (isSiteOpened())
                 isOpened = "O";
-            else isOpened = "X";
+            else
+                isOpened = "X";
 
-            if (this.id < 10)
-                id = "0"+this.id;
-            else id = String.valueOf(this.id);
+            if (this.mId < 10)
+                id = "0" + this.mId;
+            else id = String.valueOf(this.mId);
 
-            return isOpened + id +" ";
+            return isOpened + id + " ";
         }
     }
 
-    private int xyTo1D(int x, int y){
-        return ((x-1) * gridLineSize) + y;
+    private int xyTo1D(int x, int y) {
+        return ((x - 1) * gridLineSize) + y - 1;
     }
 
-    private void validate(int x, int y){
+    private void validate(int x, int y) {
         if (x < 1 || x > gridLineSize || y < 1 || y > gridLineSize)
-            throw new IllegalArgumentException("Wrong coordinates");
+            throw new IndexOutOfBoundsException("Wrong coordinates");
     }
 
-    public void open(int x, int y) throws IndexOutOfBoundsException {        // open site (row i, column j) if it is not open already
+    public void open(int x, int y) {        // open site (row i, column j) if it is not open already
         validate(x, y);
-
-        if (!isOpen(x, y)){
-            grid[x -1][y -1].setSiteOpened(true);
-        }
-
-        connectWithOpenedNeighbors(x, y);
-
-    }
-    public boolean isOpen(int x, int y) throws IndexOutOfBoundsException {// is site (row i, column j) open?
-        validate(x, y);
-        return grid[x -1][y -1].isSiteOpened();
-
-    }
-
-    private void connectWithOpenedNeighbors(int x, int y){
-        int current1DCoordinate = xyTo1D(x, y);//or need find before doing this
-        if(((x - 1) > 0) && isOpen(x - 1, y)){//up
-            unionFind.union(current1DCoordinate,xyTo1D(x - 1, y));
-
-        } else if ((x + 1) <= gridLineSize && isOpen(x + 1, y)) { //down
-            unionFind.union(current1DCoordinate,xyTo1D(x + 1, y));
-        } else if ((y + 1) <= gridLineSize && isOpen(x, y + 1)) { //right
-            unionFind.union(current1DCoordinate,xyTo1D(x, y + 1));
-        } else if ((y - 1) > 0 && isOpen(x, y - 1)) { //left
-            unionFind.union(current1DCoordinate,xyTo1D(x, y - 1));
+        Site site = grid[x - 1][y - 1];
+        if (!site.mIsOpened) {
+            site.setSiteOpened(true);
+            connectWithOpenedNeighbors(x, y);
         }
 
     }
 
-    public boolean isFull(int x, int y) throws IndexOutOfBoundsException {return false;}     // is site (row i, column j) full?
-    public boolean percolates() {return false;}             // does the system percolate?
+    public boolean isOpen(int x, int y) { // is site (row i, column j) open?
+        validate(x, y);
+        return grid[x - 1][y - 1].isSiteOpened();
 
-    public WeightedQuickUnionUF getUnionDataStruture(){
+    }
+
+    private void connectWithOpenedNeighbors(int x, int y) {
+        int current1DCoordinate = xyTo1D(x, y); //or need find before doing this
+        if (((x - 1) > 0) && isOpen(x - 1, y) && !unionFind.connected(current1DCoordinate, xyTo1D(x - 1, y))) { //up
+            unionFind.union(current1DCoordinate, xyTo1D(x - 1, y));
+        }
+        if ((x + 1) <= gridLineSize && isOpen(x + 1, y) && !unionFind.connected(current1DCoordinate, xyTo1D(x + 1, y))) { //down
+            unionFind.union(current1DCoordinate, xyTo1D(x + 1, y));
+        }
+        if ((y + 1) <= gridLineSize && isOpen(x, y + 1) && !unionFind.connected(current1DCoordinate, xyTo1D(x, y + 1))) { //right
+            unionFind.union(current1DCoordinate, xyTo1D(x, y + 1));
+        }
+        if ((y - 1) > 0 && isOpen(x, y - 1) && !unionFind.connected(current1DCoordinate, xyTo1D(x, y - 1))) { //left
+            unionFind.union(current1DCoordinate, xyTo1D(x, y - 1));
+        }
+    }
+
+    public boolean isFull(int x, int y) { // is site (row i, column j) full?
+        validate(x, y);
+        Site currentSite = grid[x - 1][y - 1];
+        if (!currentSite.mIsOpened)
+            return false;
+        for (int i = 0; i < gridLineSize; i++) {
+            Site topSite = grid[0][i];
+            if (topSite.isSiteOpened() && unionFind.connected(topSite.mId - 1, currentSite.mId - 1))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean percolates() {
+        for (int i = 0; i < gridLineSize; i++) {
+            if (isFull(gridLineSize, i + 1)) {
+                return true;
+            }
+        }
+        return false;
+    }             // does the system percolate?
+
+    private WeightedQuickUnionUF getUnionDataStruture() {
         return unionFind;
     }
 
     public static void main(String[] args) {
-//        System.out.println("Hi");
         Percolation percolation = new Percolation(4);
         WeightedQuickUnionUF unionUF = percolation.getUnionDataStruture();
 
         System.out.println("is opened 2.2: " + percolation.isOpen(2, 2));
         System.out.println("set 2.2 opened");
-        percolation.open(2,2);
+        percolation.open(2, 2);
+        System.out.println("is opened 2.2: " + percolation.isOpen(2, 2));
+        percolation.open(2, 3);
+        System.out.println(unionUF.connected(percolation.xyTo1D(2, 2), percolation.xyTo1D(2, 3)));
+        percolation.open(1, 2);
+        percolation.open(1, 1);
+        System.out.println(unionUF.connected(percolation.xyTo1D(2, 3), percolation.xyTo1D(1, 1)));
+        percolation.open(3, 3);
+        percolation.open(4, 4);
+        System.out.println("Percolates " + percolation.percolates());
+        percolation.open(3, 4);
+        System.out.println("Percolates " + percolation.percolates());
         percolation.printGrid();
-
-     /*   percolation.open(2,3);
-        percolation.printGrid();*/
+        System.out.println(unionUF.connected(percolation.xyTo1D(1, 2), percolation.xyTo1D(2, 2)));
+        System.out.println(unionUF.connected(percolation.xyTo1D(1, 2), percolation.xyTo1D(2, 3)));
+        System.out.println(unionUF.connected(percolation.xyTo1D(1, 2), percolation.xyTo1D(3, 3)));
+        System.out.println(unionUF.connected(percolation.xyTo1D(1, 2), percolation.xyTo1D(3, 4)));
+        System.out.println(unionUF.connected(percolation.xyTo1D(1, 2), percolation.xyTo1D(4, 4)));
+        System.out.println(percolation.isFull(3, 3));
+        System.out.println(percolation.isFull(3, 4));
+        System.out.println(percolation.isFull(4, 3));
+        System.out.println(percolation.isFull(4, 4));
 
     }   // test client (optional)
-
-    /*
-    initialize all sites to be blocked.
-    Repeat the following until the system percolates:
-    Choose a site (row i, column j) uniformly at random among all blocked sites.
-    Open the site (row i, column j).
-    The fraction of sites that are opened when the system percolates provides an estimate of the percolation thres
-    */
 }
