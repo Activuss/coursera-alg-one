@@ -9,12 +9,6 @@ public class Percolation {
             unionFind = new WeightedQuickUnionUF(N * N);
             gridLineSize = N;
             openedSites = new boolean[N][N];
-            /*int count = 1;
-            for (int i = 0; i < N; i++) {
-                for (int j = 0; j < N; j++) {
-                    openedSites[i][j] = new Site(count++);
-                }
-            }*/
         } else {
             throw new IllegalArgumentException();
         }
@@ -28,39 +22,6 @@ public class Percolation {
             System.out.println();
         }
     }
-
-   /* private static class Site {
-        private int mId;
-        private boolean mIsOpened;
-
-        public Site(int id) {
-            this.mId = id;
-        }
-
-        public void setSiteOpened(boolean isOpened) {
-            this.mIsOpened = isOpened;
-        }
-
-        public boolean isSiteOpened() {
-            return mIsOpened;
-        }
-
-        @Override
-        public String toString() {
-            String isOpened;
-            String id;
-            if (isSiteOpened())
-                isOpened = "O";
-            else
-                isOpened = "X";
-
-            if (this.mId < 10)
-                id = "0" + this.mId;
-            else id = String.valueOf(this.mId);
-
-            return isOpened + id + " ";
-        }
-    }*/
 
     private int xyTo1D(int x, int y) {
         return ((x - 1) * gridLineSize) + y - 1;
@@ -78,17 +39,15 @@ public class Percolation {
             openedSites[x - 1][y - 1] = true;
             connectWithOpenedNeighbors(x, y);
         }
-
     }
 
     public boolean isOpen(int x, int y) { // is site (row i, column j) open?
         validate(x, y);
         return openedSites[x - 1][y - 1];
-
     }
 
     private void connectWithOpenedNeighbors(int x, int y) {
-        int current1DCoordinate = xyTo1D(x, y); //or need find before doing this
+        int current1DCoordinate = xyTo1D(x, y);
         if (((x - 1) > 0) && isOpen(x - 1, y) && !unionFind.connected(current1DCoordinate, xyTo1D(x - 1, y))) { //up
             unionFind.union(current1DCoordinate, xyTo1D(x - 1, y));
         }
