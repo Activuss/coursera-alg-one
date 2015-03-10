@@ -107,18 +107,6 @@ public class Deque<Item> implements Iterable<Item> {
         return iterator;
     }
 
-    public String toString() {
-        StringBuilder s = new StringBuilder();
-        Node node = pre.next;
-        for (int i = 0; i < N; i++) {
-            s.append(node.item);
-            s.append(" ");
-            node = node.next;
-        }
-        return s.toString();
-    }
-
-
     public static void main(String[] args) {   // unit testing
     Deque<Integer> integers = new Deque<Integer>();
         System.out.println(integers);

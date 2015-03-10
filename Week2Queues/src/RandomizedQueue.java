@@ -66,19 +66,31 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         return item;
     }
     public Iterator<Item> iterator() {        // return an independent iterator over items in random order
+        final int [] arrayIndex = new int[N];
+        int count = 0;
+        for (int i = 0; i < a.length; i++) {
+            if (a[i] != null) {
+                arrayIndex[count++] = i;
+            }
+        }
+        StdRandom.shuffle(arrayIndex);
+
+        final int finalCount = count;
         Iterator iterator = new Iterator() {
-            private int i = 0;
+            private int i = finalCount - 1;
             @Override
             public boolean hasNext() {
-                return i <= N - 1;
+                return i >= 0;
             }
 
             @Override
-            public Object next() {
+            public Item next() {
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                return a[i++];
+
+                int index =  arrayIndex[i--];
+                return a[index];
             }
 
             @Override
@@ -89,24 +101,26 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         return iterator;
     }
 
-    @Override
-    public String toString() {
-        return "RandomizedQueue{" +
-                "a=" + Arrays.toString(a) +
-                '}';
-    }
-
     public static void main(String[] args) {   // unit testing
         RandomizedQueue<Integer> randomizedQueue = new RandomizedQueue<Integer>();
         randomizedQueue.enqueue(1);
         randomizedQueue.enqueue(2);
         randomizedQueue.enqueue(3);
-        System.out.println(randomizedQueue);
+        randomizedQueue.enqueue(4);
+        randomizedQueue.enqueue(5);
+        randomizedQueue.enqueue(6);
         System.out.println(randomizedQueue.sample());
         System.out.println(randomizedQueue.sample());
         System.out.println(randomizedQueue.sample());
         System.out.println(randomizedQueue.dequeue());
         System.out.println(randomizedQueue.dequeue());
-        System.out.println(randomizedQueue.dequeue());
+        System.out.println("-------");
+        for (Integer i : randomizedQueue) {
+            System.out.println(i);
+            System.out.println("--nested start-----");
+            for (Integer j : randomizedQueue) {
+                System.out.print(j);}
+            System.out.println("---end----");
+        }
     }
 }
