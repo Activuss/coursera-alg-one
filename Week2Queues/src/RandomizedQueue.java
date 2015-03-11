@@ -23,7 +23,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         Item[] temp = (Item[]) new Object[capacity];
         int copiedItems = 0;
         int counter = 0;
-        while (copiedItems != N){
+        while (copiedItems != N) {
             if (a[counter] != null) {
                 temp[copiedItems] = a[counter];
                 copiedItems++;
@@ -65,42 +65,31 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
         return item;
     }
-    public Iterator<Item> iterator() {        // return an independent iterator over items in random order
-        final int [] arrayIndex = new int[N];
-        int count = 0;
-        for (int i = 0; i < a.length; i++) {
-            if (a[i] != null) {
-                arrayIndex[count++] = i;
-            }
+
+    private class RandQueueIterator implements Iterator {
+        private int i = 0;
+        @Override
+        public boolean hasNext() {
+            return i <= N - 1;
         }
-        StdRandom.shuffle(arrayIndex);
 
-        final int finalCount = count;
-        Iterator iterator = new Iterator() {
-            private int i = finalCount - 1;
-            @Override
-            public boolean hasNext() {
-                return i >= 0;
+        @Override
+        public Object next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
             }
+            return a[i++];
+        }
 
-            @Override
-            public Item next() {
-                if (!hasNext()) {
-                    throw new NoSuchElementException();
-                }
-
-                int index =  arrayIndex[i--];
-                return a[index];
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
-        return iterator;
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 
+    public Iterator iterator() {        // return an independent iterator over items in random order
+        return new RandQueueIterator();
+    }
     public static void main(String[] args) {   // unit testing
         RandomizedQueue<Integer> randomizedQueue = new RandomizedQueue<Integer>();
         randomizedQueue.enqueue(1);
@@ -115,11 +104,12 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         System.out.println(randomizedQueue.dequeue());
         System.out.println(randomizedQueue.dequeue());
         System.out.println("-------");
-        for (Integer i : randomizedQueue) {
+        for (int i : randomizedQueue) {
             System.out.println(i);
             System.out.println("--nested start-----");
-            for (Integer j : randomizedQueue) {
-                System.out.print(j);}
+            for (int j : randomizedQueue) {
+                System.out.print(j);
+            }
             System.out.println("---end----");
         }
     }

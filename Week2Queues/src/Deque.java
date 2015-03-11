@@ -79,32 +79,33 @@ public class Deque<Item> implements Iterable<Item> {
         return item;
     }
 
-    public Iterator<Item> iterator() {        // return an iterator over items in order from front to end
-        Iterator iterator = new Iterator() {
-            private Node current = pre.next;
-            int index = 0;
-            @Override
-            public boolean hasNext() {
-                return index < N;
-            }
+    private class DequeIterator implements Iterator {
+        private Node current = pre.next;
+        private int index = 0;
+        @Override
+        public boolean hasNext() {
+            return index < N;
+        }
 
-            @Override
-            public Item next() {
-                if (!hasNext()) {
-                    throw new NoSuchElementException();
-                }
-                Item item = current.item;
-                current = current.next;
-                index++;
-                return item;
+        @Override
+        public Item next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
             }
+            Item item = current.item;
+            current = current.next;
+            index++;
+            return item;
+        }
 
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
-        return iterator;
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public Iterator iterator() {        // return an iterator over items in order from front to end
+        return new DequeIterator();
     }
 
     public static void main(String[] args) {   // unit testing
@@ -122,7 +123,7 @@ public class Deque<Item> implements Iterable<Item> {
         System.out.println(integers);
         System.out.println("             ");
 
-        for (Integer items : integers){
+        for (int items : integers) {
             System.out.println(items);
         }
 

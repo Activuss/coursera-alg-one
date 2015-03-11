@@ -7,9 +7,9 @@ public class Subset {
 
         RandomizedQueue<String> randomizedQueue = new RandomizedQueue<String>();
         boolean isKReaded = false;
-        Integer numberOfItems = null;
+        int numberOfItems = 0;
         while (!StdIn.isEmpty()) {
-            if (!isKReaded){
+            if (!isKReaded) {
                 numberOfItems = StdIn.readInt();
                 isKReaded = true;
             }
@@ -21,7 +21,7 @@ public class Subset {
         }
 
         for (String s : randomizedQueue) {
-            if (numberOfItems != null && numberOfItems > 0) {
+            if (numberOfItems > 0) {
                 StdOut.print(s);
                 StdOut.print(" ");
                 numberOfItems--;
