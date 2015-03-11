@@ -10,7 +10,7 @@ public class Subset {
         int numberOfItems = 0;
         while (!StdIn.isEmpty()) {
             if (!isKReaded) {
-                numberOfItems = StdIn.readInt();
+                numberOfItems = StdIn.readChar();
                 isKReaded = true;
             }
             String item = StdIn.readString();

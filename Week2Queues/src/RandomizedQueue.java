@@ -1,19 +1,20 @@
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private Item[] a;         // array of items
     private int N;            // number of elements on stack
-    private int ejectedIndex = 0;
+    private int lastDeletedIndex;
 
     public RandomizedQueue() {                // construct an empty randomized queue
         a = (Item[]) new Object[2];
 
     }
+
     public boolean isEmpty() {                // is the queue empty?
         return N == 0;
     }
+
     public int size() {                        // return the number of items on the queue
         return N;
     }
@@ -25,13 +26,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         int counter = 0;
         while (copiedItems != N) {
             if (a[counter] != null) {
-                temp[copiedItems] = a[counter];
-                copiedItems++;
+                temp[copiedItems++] = a[counter];
             }
             counter++;
         }
-        ejectedIndex = 0;
-
         a = temp;
     }
 
@@ -39,21 +37,34 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (item == null) {
             throw new NullPointerException();
         }
-        if (N == a.length) resize(2*a.length);    // double size of array if necessary
-        a[N++] = item;                            // add item
+        if (N == a.length) resize(2 * a.length);    // double size of array if necessary
+        Item existedItem = a[N];
+        if (existedItem == null) {
+            a[N++] = item;                            // add item
+        } else {
+            a[lastDeletedIndex] = item;
+        }
 
     }
+
     public Item dequeue() {                    // remove and return a random item
         if (size() == 0) {
             throw new NoSuchElementException();
         }
-        Item item = a[ejectedIndex];
-        a[ejectedIndex++] = null;                              // to avoid loitering
+        Item item;
+        int index;
+        do {
+            index = StdRandom.uniform(N);
+            item = a[index];
+        } while (item == null);
+        lastDeletedIndex = index;
+        a[index] = null;                              // to avoid loitering
         N--;
         // shrink size of array if necessary
-        if (N > 0 && N == a.length/4) resize(a.length/2);
+        if (N > 0 && N == a.length / 4) resize(a.length / 2);
         return item;
     }
+
     public Item sample() {                     // return (but do not remove) a random item
         if (size() == 0) {
             throw new NoSuchElementException();
@@ -67,10 +78,23 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     private class RandQueueIterator implements Iterator {
-        private int i = 0;
+
+        private final int[] arrayIndex = new int[N];
+        private int count = 0;
+
+        public RandQueueIterator() {
+            for (int i = 0; i < a.length; i++) {
+                if (a[i] != null) {
+                    arrayIndex[count++] = i;
+                }
+            }
+            StdRandom.shuffle(arrayIndex);
+
+        }
+
         @Override
         public boolean hasNext() {
-            return i <= N - 1;
+            return count > 0;
         }
 
         @Override
@@ -78,7 +102,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            return a[i++];
+
+            int index = arrayIndex[--count];
+            return a[index];
         }
 
         @Override
@@ -87,9 +113,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
     }
 
-    public Iterator iterator() {        // return an independent iterator over items in random order
+    public Iterator<Item> iterator() {        // return an independent iterator over items in random order
         return new RandQueueIterator();
     }
+
     public static void main(String[] args) {   // unit testing
         RandomizedQueue<Integer> randomizedQueue = new RandomizedQueue<Integer>();
         randomizedQueue.enqueue(1);
@@ -97,6 +124,15 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         randomizedQueue.enqueue(3);
         randomizedQueue.enqueue(4);
         randomizedQueue.enqueue(5);
+        randomizedQueue.enqueue(6);
+        randomizedQueue.enqueue(6);
+        randomizedQueue.enqueue(6);
+        randomizedQueue.enqueue(6);
+        randomizedQueue.enqueue(6);
+        randomizedQueue.enqueue(6);
+        randomizedQueue.enqueue(6);
+        randomizedQueue.enqueue(6);
+        randomizedQueue.enqueue(6);
         randomizedQueue.enqueue(6);
         System.out.println(randomizedQueue.sample());
         System.out.println(randomizedQueue.sample());
