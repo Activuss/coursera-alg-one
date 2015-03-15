@@ -6,20 +6,17 @@ public class Subset {
         on standard input.*/
 
         RandomizedQueue<String> randomizedQueue = new RandomizedQueue<String>();
-        boolean isKReaded = false;
-        int numberOfItems = 0;
+        int numberOfItems;
         while (!StdIn.isEmpty()) {
-            if (!isKReaded) {
-                numberOfItems = StdIn.readChar();
-                isKReaded = true;
-            }
             String item = StdIn.readString();
-            if (item.length() > 0)
+            if (item.length() > 0) {
                 randomizedQueue.enqueue(item);
-            else
+            } else {
                 break;
+            }
         }
 
+        numberOfItems = Integer.parseInt(args[0]);
         for (String s : randomizedQueue) {
             if (numberOfItems > 0) {
                 StdOut.print(s);
