@@ -17,14 +17,8 @@ public class Subset {
         }
 
         numberOfItems = Integer.parseInt(args[0]);
-        for (String s : randomizedQueue) {
-            if (numberOfItems > 0) {
-                StdOut.print(s);
-                StdOut.print(" ");
-                numberOfItems--;
-            } else {
-                break;
-            }
+        for (int i = 0; i<numberOfItems; i++) {
+            StdOut.println(randomizedQueue.dequeue());
         }
     }
 }

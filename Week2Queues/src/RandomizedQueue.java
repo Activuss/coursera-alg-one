@@ -4,7 +4,7 @@ import java.util.NoSuchElementException;
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private Item[] a;         // array of items
     private int N;            // number of elements on stack
-    private int lastDeletedIndex;
+    private int lastDeletedIndex = -1;
 
     public RandomizedQueue() {                // construct an empty randomized queue
         a = (Item[]) new Object[2];
@@ -24,7 +24,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         Item[] temp = (Item[]) new Object[capacity];
         int copiedItems = 0;
         int counter = 0;
-        while (copiedItems != N) {
+        while (copiedItems != N && (counter <= a.length - 1)) {
             if (a[counter] != null) {
                 temp[copiedItems++] = a[counter];
             }
@@ -37,12 +37,30 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (item == null) {
             throw new NullPointerException();
         }
-        if (N == a.length) resize(2 * a.length);    // double size of array if necessary
-        Item existedItem = a[N];
+       /* Item existedItem = a[N];
         if (existedItem == null) {
             a[N++] = item;                            // add item
         } else {
             a[lastDeletedIndex] = item;
+            N++;
+        }*/
+        if ((lastDeletedIndex < (a.length - 1)) && lastDeletedIndex >= 0) {
+            Item lastDeletedItem = a[lastDeletedIndex];
+            if (lastDeletedItem == null) {
+                a[lastDeletedIndex] = item;
+                N++;
+                return;
+            } else {
+                if (N == a.length) {
+                    resize(2 * a.length);    // double size of array if necessary
+                }
+                a[N++] = item;                            // add item
+            }
+        } else {
+        if (N == a.length) {
+            resize(2 * a.length);    // double size of array if necessary
+        }
+        a[N++] = item;                            // add item
         }
 
     }
@@ -54,7 +72,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         Item item;
         int index;
         do {
-            index = StdRandom.uniform(N);
+            index = StdRandom.uniform(a.length);
             item = a[index];
         } while (item == null);
         lastDeletedIndex = index;
@@ -71,7 +89,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
         Item item;
         do {
-            item = a[StdRandom.uniform(N)];
+            item = a[StdRandom.uniform(a.length)];
         } while (item == null);
 
         return item;
@@ -119,9 +137,35 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     public static void main(String[] args) {   // unit testing
         RandomizedQueue<Integer> randomizedQueue = new RandomizedQueue<Integer>();
-        randomizedQueue.enqueue(1);
-        randomizedQueue.enqueue(2);
-        randomizedQueue.enqueue(3);
+        try {
+            System.out.println("size " + randomizedQueue.size());
+            System.out.println("enque 1");
+            randomizedQueue.enqueue(1);
+            System.out.println("enque 2");
+            randomizedQueue.enqueue(2);
+            System.out.println("enque 2");
+            randomizedQueue.enqueue(2);
+            System.out.println("enque 2");
+            randomizedQueue.enqueue(2);
+            System.out.println("enque 2");
+            randomizedQueue.enqueue(2);
+            System.out.println("enque 2");
+            randomizedQueue.enqueue(2);
+            System.out.println("size " + randomizedQueue.size());
+            System.out.println("deque " + randomizedQueue.dequeue());
+            randomizedQueue.enqueue(2);
+            System.out.println("deque " + randomizedQueue.dequeue());
+            System.out.println("deque " + randomizedQueue.dequeue());
+            randomizedQueue.enqueue(2);
+            System.out.println("deque " + randomizedQueue.dequeue());
+            System.out.println("deque " + randomizedQueue.dequeue());
+            System.out.println("deque " + randomizedQueue.dequeue());
+            randomizedQueue.enqueue(2);
+            System.out.println("size " + randomizedQueue.size());
+        } catch (Throwable ex ) {
+            ex.printStackTrace();
+        }
+        /*randomizedQueue.enqueue(3);
         randomizedQueue.enqueue(4);
         randomizedQueue.enqueue(5);
         randomizedQueue.enqueue(6);
@@ -147,6 +191,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
                 System.out.print(j);
             }
             System.out.println("---end----");
-        }
+        }*/
     }
 }
